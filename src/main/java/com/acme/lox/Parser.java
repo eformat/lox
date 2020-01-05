@@ -25,6 +25,7 @@ import static com.acme.lox.TokenType.NUMBER;
 import static com.acme.lox.TokenType.OR;
 import static com.acme.lox.TokenType.PLUS;
 import static com.acme.lox.TokenType.PRINT;
+import static com.acme.lox.TokenType.RETURN;
 import static com.acme.lox.TokenType.RIGHT_BRACE;
 import static com.acme.lox.TokenType.RIGHT_PAREN;
 import static com.acme.lox.TokenType.SEMICOLON;
@@ -182,6 +183,20 @@ declaration → funDecl
 funDecl  → "fun" function ;
 function → IDENTIFIER "(" parameters? ")" block ;            
 
+--
+
+// Return Statements
+
+statement  → exprStmt
+           | forStmt
+           | ifStmt
+           | printStmt
+           | returnStmt
+           | whileStmt
+           | block ;
+
+returnStmt → "return" expression? ";" ;
+
 
 //@formatter:on
 */
@@ -283,8 +298,8 @@ class Parser {
         consume(RIGHT_PAREN, "Expect ')' after parameters.");
 
         consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
-        List<Stmt> body = block();                                  
-        return new Stmt.Function(name, parameters, body);         
+        List<Stmt> body = block();
+        return new Stmt.Function(name, parameters, body);
     }
 
     private Stmt statement() {
@@ -297,6 +312,9 @@ class Parser {
         if (match(PRINT))
             return printStatement();
 
+        if (match(RETURN))
+            return returnStatement();
+
         if (match(WHILE))
             return whileStatement();
 
@@ -304,6 +322,17 @@ class Parser {
             return new Stmt.Block(block());
 
         return expressionStatement();
+    }
+
+    private Stmt returnStatement() {
+        Token keyword = previous();
+        Expr value = null;
+        if (!check(SEMICOLON)) {
+            value = expression();
+        }
+
+        consume(SEMICOLON, "Expect ';' after return value.");
+        return new Stmt.Return(keyword, value);
     }
 
     private Stmt forStatement() {

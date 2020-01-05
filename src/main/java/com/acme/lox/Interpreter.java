@@ -15,6 +15,7 @@ import com.acme.lox.Stmt.Expression;
 import com.acme.lox.Stmt.Function;
 import com.acme.lox.Stmt.If;
 import com.acme.lox.Stmt.Print;
+import com.acme.lox.Stmt.Return;
 import com.acme.lox.Stmt.Var;
 import com.acme.lox.Stmt.While;
 
@@ -284,9 +285,18 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitFunctionStmt(Function stmt) {
-        LoxFunction function = new LoxFunction(stmt);
+        LoxFunction function = new LoxFunction(stmt, environment);
         environment.define(stmt.name.lexeme, function);
         return null;
+    }
+
+    @Override
+    public Void visitReturnStmt(Return stmt) {
+        Object value = null;
+        if (stmt.value != null)
+            value = evaluate(stmt.value);
+
+        throw new com.acme.lox.Return(value);
     }
 
 }
