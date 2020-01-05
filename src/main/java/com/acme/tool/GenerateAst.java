@@ -5,57 +5,6 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
 
-
-/*
-//@formatter:off
-
-// Expressions
-
-expression → literal
-           | unary
-           | binary
-           | grouping ;
-
-literal    → NUMBER | STRING | "true" | "false" | "nil" ;
-grouping   → "(" expression ")" ;
-unary      → ( "-" | "!" ) expression ;
-binary     → expression operator expression ;
-operator   → "==" | "!=" | "<" | "<=" | ">" | ">="
-           | "+"  | "-"  | "*" | "/" ;
-
---
-
-// Statements
-
-program   → statement* EOF ;
-
-statement → exprStmt
-          | printStmt ;
-
-exprStmt  → expression ";" ;
-printStmt → "print" expression ";" ;
-
---
-
-// Assignment
-
-expression → assignment ;
-assignment → IDENTIFIER "=" assignment
-           | equality ;
-
---
-
-// Blocks
-
-statement → exprStmt
-          | printStmt
-          | block ;
-
-block     → "{" declaration* "}" ;
-
-//@formatter:on
-*/
-
 public class GenerateAst {
     public static void main(String[] args) throws IOException {
         if (args.length != 1) {
@@ -71,6 +20,7 @@ public class GenerateAst {
 
         defineAst(outputDir, "Stmt",
                 Arrays.asList("Block      : List<Stmt> statements", "Expression : Expr expression",
+                        "If         : Expr condition, Stmt thenBranch, Stmt elseBranch",
                         "Print      : Expr expression",
                         "Var        : Token name, Expr initializer"));
     }

@@ -9,6 +9,7 @@ import com.acme.lox.Expr.Unary;
 import com.acme.lox.Expr.Variable;
 import com.acme.lox.Stmt.Block;
 import com.acme.lox.Stmt.Expression;
+import com.acme.lox.Stmt.If;
 import com.acme.lox.Stmt.Print;
 import com.acme.lox.Stmt.Var;
 
@@ -201,5 +202,15 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             this.environment = previous;
         }
     }
-    
+
+    @Override
+    public Void visitIfStmt(If stmt) {
+        if (isTruthy(evaluate(stmt.condition))) {
+            execute(stmt.thenBranch);
+        } else if (stmt.elseBranch != null) {
+            execute(stmt.elseBranch);
+        }
+        return null;
+    }
+
 }

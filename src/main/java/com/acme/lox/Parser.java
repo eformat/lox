@@ -2,6 +2,7 @@ package com.acme.lox;
 
 import static com.acme.lox.TokenType.BANG;
 import static com.acme.lox.TokenType.BANG_EQUAL;
+import static com.acme.lox.TokenType.ELSE;
 import static com.acme.lox.TokenType.EOF;
 import static com.acme.lox.TokenType.EQUAL;
 import static com.acme.lox.TokenType.EQUAL_EQUAL;
@@ -9,6 +10,7 @@ import static com.acme.lox.TokenType.FALSE;
 import static com.acme.lox.TokenType.GREATER;
 import static com.acme.lox.TokenType.GREATER_EQUAL;
 import static com.acme.lox.TokenType.IDENTIFIER;
+import static com.acme.lox.TokenType.IF;
 import static com.acme.lox.TokenType.LEFT_BRACE;
 import static com.acme.lox.TokenType.LEFT_PAREN;
 import static com.acme.lox.TokenType.LESS;
@@ -105,6 +107,17 @@ statement → exprStmt
 
 block     → "{" declaration* "}" ;
 
+--
+
+// Conditional Execution
+
+statement → exprStmt
+          | ifStmt
+          | printStmt
+          | block ;
+
+ifStmt    → "if" "(" expression ")" statement ( "else" statement )? ;
+
 
 //@formatter:on
 */
@@ -164,6 +177,9 @@ class Parser {
     }
 
     private Stmt statement() {
+        if (match(IF))
+            return ifStatement();
+
         if (match(PRINT))
             return printStatement();
 
@@ -171,6 +187,19 @@ class Parser {
             return new Stmt.Block(block());
 
         return expressionStatement();
+    }
+
+    private Stmt ifStatement() {
+        consume(LEFT_PAREN, "Expect '(' after 'if'.");
+        Expr condition = expression();
+        consume(RIGHT_PAREN, "Expect ')' after if condition.");
+        Stmt thenBranch = statement();
+        Stmt elseBranch = null;
+        if (match(ELSE)) {
+            elseBranch = statement();
+        }
+
+        return new Stmt.If(condition, thenBranch, elseBranch);
     }
 
     private Stmt expressionStatement() {
