@@ -1,5 +1,6 @@
 package com.acme.lox;
 
+import static com.acme.lox.TokenType.AND;
 import static com.acme.lox.TokenType.BANG;
 import static com.acme.lox.TokenType.BANG_EQUAL;
 import static com.acme.lox.TokenType.ELSE;
@@ -18,6 +19,7 @@ import static com.acme.lox.TokenType.LESS_EQUAL;
 import static com.acme.lox.TokenType.MINUS;
 import static com.acme.lox.TokenType.NIL;
 import static com.acme.lox.TokenType.NUMBER;
+import static com.acme.lox.TokenType.OR;
 import static com.acme.lox.TokenType.PLUS;
 import static com.acme.lox.TokenType.PRINT;
 import static com.acme.lox.TokenType.RIGHT_BRACE;
@@ -118,6 +120,16 @@ statement → exprStmt
 
 ifStmt    → "if" "(" expression ")" statement ( "else" statement )? ;
 
+--
+
+// Logical Operators
+
+expression → assignment ;
+assignment → identifier "=" assignment
+           | logic_or ;
+logic_or   → logic_and ( "or" logic_and )* ;
+logic_and  → equality ( "and" equality )* ;
+
 
 //@formatter:on
 */
@@ -147,7 +159,7 @@ class Parser {
     }
 
     private Expr assignment() {
-        Expr expr = equality();
+        Expr expr = or();
 
         if (match(EQUAL)) {
             Token equals = previous();
@@ -159,6 +171,30 @@ class Parser {
             }
 
             error(equals, "Invalid assignment target.");
+        }
+
+        return expr;
+    }
+
+    private Expr or() {
+        Expr expr = and();
+
+        while (match(OR)) {
+            Token operator = previous();
+            Expr right = and();
+            expr = new Expr.Logical(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    private Expr and() {
+        Expr expr = equality();
+
+        while (match(AND)) {
+            Token operator = previous();
+            Expr right = equality();
+            expr = new Expr.Logical(expr, operator, right);
         }
 
         return expr;

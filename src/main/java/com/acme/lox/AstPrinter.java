@@ -1,6 +1,7 @@
 package com.acme.lox;
 
 import com.acme.lox.Expr.Assign;
+import com.acme.lox.Expr.Logical;
 import com.acme.lox.Expr.Variable;
 
 // Creates an unambiguous, if ugly, string representation of AST nodes.
@@ -61,6 +62,12 @@ class AstPrinter implements Expr.Visitor<String> {
 
     @Override
     public String visitAssignExpr(Assign expr) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String visitLogicalExpr(Logical expr) {
         // TODO Auto-generated method stub
         return null;
     }
