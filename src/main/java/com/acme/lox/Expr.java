@@ -2,7 +2,6 @@ package com.acme.lox;
 
 /*** Generated Code - see: com.acme.tool.GenerateAst ***/
 
-
 abstract class Expr {
     interface Visitor<R> {
         R visitAssignExpr(Assign expr);

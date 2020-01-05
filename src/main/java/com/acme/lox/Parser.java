@@ -30,6 +30,7 @@ import static com.acme.lox.TokenType.STAR;
 import static com.acme.lox.TokenType.STRING;
 import static com.acme.lox.TokenType.TRUE;
 import static com.acme.lox.TokenType.VAR;
+import static com.acme.lox.TokenType.WHILE;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -130,6 +131,17 @@ assignment → identifier "=" assignment
 logic_or   → logic_and ( "or" logic_and )* ;
 logic_and  → equality ( "and" equality )* ;
 
+--
+
+// While Loops
+
+statement → exprStmt
+          | ifStmt
+          | printStmt
+          | whileStmt
+          | block ;
+
+whileStmt → "while" "(" expression ")" statement ;
 
 //@formatter:on
 */
@@ -219,6 +231,9 @@ class Parser {
         if (match(PRINT))
             return printStatement();
 
+        if (match(WHILE))
+            return whileStatement();
+
         if (match(LEFT_BRACE))
             return new Stmt.Block(block());
 
@@ -271,6 +286,15 @@ class Parser {
 
         consume(SEMICOLON, "Expect ';' after variable declaration.");
         return new Stmt.Var(name, initializer);
+    }
+
+    private Stmt whileStatement() {
+        consume(LEFT_PAREN, "Expect '(' after 'while'.");
+        Expr condition = expression();
+        consume(RIGHT_PAREN, "Expect ')' after condition.");
+        Stmt body = statement();
+
+        return new Stmt.While(condition, body);
     }
 
     private Expr equality() {
